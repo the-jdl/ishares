@@ -72,7 +72,10 @@ class HoldingsProcessor:
     def get_holdings_df(self):
         self.response_content = self.request_csv()
         csv_buffer = StringIO(self.response_content.decode())
-        self.holdings_df = pd.read_csv(csv_buffer, header=9, thousands=',', na_values='-').dropna(thresh=10)
+        assert 'Ticker' in self.response_content.decode(), "Can't find start of header row."
+        position = self.response_content.decode().index('Ticker')
+        csv_buffer.seek(position)
+        self.holdings_df = pd.read_csv(csv_buffer, header=0, thousands=',', na_values='-').dropna(thresh=10)
         return self
 
     def archive_original_csv(self):
