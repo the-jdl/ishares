@@ -22,9 +22,12 @@ class Aws:
 
 class iShares:
     # fixed ishares.com values, the rest is derived/scraped
-    ROOT = 'https://www.ishares.com'
-    LANDING_PAGE = f'{ROOT}/us/products/etf-investments#!type=ishares&style=All&view=keyFacts'
-    AJAX_REQUEST_CODE = '1467271812596.ajax'  # part of csv download request, subject to change (?)
+    #ROOT = 'https://www.ishares.com'
+    #ROOT = 'https://www.blackrock.com'
+
+    #LANDING_PAGE = f'{ROOT}/us/products/etf-investments#!type=ishares&style=All&view=keyFacts'
+    #AJAX_REQUEST_CODE = '1467271812596.ajax'  # part of csv download request, subject to change (?)
+    #AJAX_REQUEST_CODE = '1478358644060.ajax'  # part of csv download request, subject to change (?)
 
     # first date that ishares.com makes holdings available
     FIRST_AVAILABLE_HOLDINGS_DATE = '2006-09-29'
@@ -35,8 +38,8 @@ class iShares:
     HOLDINGS_FILE_SCHEMAS = './ishares/data/ishares-file-schemas.json'
 
     # throttle requests to ishares.com
-    MIN_SLEEP_BETWEEN_REQUESTS = 30
-    MAX_SLEEP_BETWEEN_REQUESTS = 60
+    MIN_SLEEP_BETWEEN_REQUESTS = 3
+    MAX_SLEEP_BETWEEN_REQUESTS = 6
 
     USER_AGENT_LIST = [
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36',

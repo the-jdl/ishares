@@ -63,8 +63,11 @@ def main(tickers: list, outputpath: str, overwrite: bool) -> None:
     for ticker in tickers:
         holdings_download_list = build_holdings_download_queue(ticker, outputpath, overwrite)
         for holding_date in holdings_download_list:
-            etf_downloader.main(ticker, holding_date, outputpath)
-            sleep_between_requests()
+            try:        
+                etf_downloader.main(ticker, holding_date, outputpath)
+                #sleep_between_requests()
+            except Exception as e: 
+                print(e)
 
 
 # everything below will only be executed if this script is called from the command line

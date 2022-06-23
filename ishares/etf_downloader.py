@@ -33,6 +33,8 @@ class HoldingsProcessor:
         self.name = etf_index[ticker]['name']
         self.start_date = datetime.strptime(etf_index[ticker]['start_date'], '%Y-%m-%d')
         self.product_url = etf_index[ticker]['product_url']
+        self.root_url = etf_index[ticker]['root_url']
+        self.ajax_url = etf_index[ticker]['ajax_url']
 
         # holdings information
         self.holdings_date = datetime.strptime(holdings_date, '%Y-%m-%d').strftime('%Y-%m-%d')
@@ -50,13 +52,13 @@ class HoldingsProcessor:
 
     def request_csv(self):
         yyyymmdd = datetime.strptime(self.holdings_date, '%Y-%m-%d').strftime('%Y%m%d')
-        request = dict(url=f'{iShares.ROOT}{self.product_url}/{iShares.AJAX_REQUEST_CODE}',
+        request = dict(url=f'{self.root_url}{self.product_url}/{self.ajax_url}',
                        params={'fileType': 'csv',
                                'fileName': f'{self.ticker}_holdings',
                                'dataType': 'fund',
                                'asOfDate': yyyymmdd},
                        headers={'User-Agent': random.choice(iShares.USER_AGENT_LIST)})
-
+        #log.info(f'attempting response from ishares.com for request: {request.url}')
         response = requests.get(**request)
 
         # todo error handling / logging here
@@ -64,6 +66,7 @@ class HoldingsProcessor:
         assert len(response.content) > 0, "empty response"
 
         log.info(f'successful response from ishares.com for request: {response.url}')
+        print(f'successful response from ishares.com for request: {response.url}')        
         return response.content
 
     def get_holdings_df(self):

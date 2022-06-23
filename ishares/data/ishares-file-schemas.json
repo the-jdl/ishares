@@ -56,5 +56,20 @@
       "Maturity",
       "Market Currency"
     ]
+  },
+  "us_equity_current": {
+    "columns": [
+      "Ticker","Name","Sector","Asset Class","Market Value","Weight (%)","Notional Value","Shares","Price","Location","Exchange","Currency","FX Rate","Market Currency","Accrual Date"
+    ]
+  },
+  "au_equity1": {
+    "columns": [
+      "Ticker","Name","Asset Class","Weight (%)","Price","Shares","Market Value","Notional Value","Sector","SEDOL","ISIN","CUSIP","Exchange","Location","Currency","Market Currency"      
+    ]
+  },
+  "uk_equity1": {
+    "columns": [
+      "Ticker","Name","Sector","Asset Class","Market Value","Weight (%)","Notional Value","Shares","Price","Location","Exchange","Market Currency"
+    ]
   }
 }
