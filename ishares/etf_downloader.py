@@ -12,6 +12,11 @@ import boto3
 import logging
 import json
 import multiprocessing as mp
+import codecs
+import requests
+
+
+
 
 log = logging.getLogger(__name__)
 
@@ -20,8 +25,13 @@ log = logging.getLogger(__name__)
 # -----------------------------------------------------------------------------------
 etf_index = pd.read_csv(iShares.ETF_MASTER_INDEX_LOC).set_index('ticker').to_dict('index')
 
+
+# Taking out this part #
 with open(iShares.HOLDINGS_FILE_SCHEMAS, 'r') as f:
     holdings_file_schemas = json.load(f)
+
+
+
 
 
 # HoldingsProcessor manages the data-pipeline from ishares.com to aws s3
@@ -59,6 +69,7 @@ class HoldingsProcessor:
 
         response = requests.get(**request)
 
+
         # todo error handling / logging here
         assert response != 200, "response error (not 200)"
         assert len(response.content) > 0, "empty response"
@@ -72,7 +83,36 @@ class HoldingsProcessor:
         self.holdings_df = pd.read_csv(csv_buffer, header=9, thousands=',', na_values='-').dropna(thresh=10)
         return self
 
-    def archive_original_csv(self):
+    ###################### Zane added below code #################
+    def request_json(self):
+        yyyymmdd = datetime.strptime(self.holdings_date, '%Y-%m-%d').strftime('%Y%m%d')
+        requestJSON = dict(url=f'{iShares.ROOT}{self.product_url}/{iShares.AJAX_REQUEST_CODE}',
+                           params={'fileType': 'json',
+                                   'fileName': f'{self.ticker}_holdings',
+                                   'dataType': 'fund',
+                                   'asOfDate': yyyymmdd},
+                        headers={'User-Agent': random.choice(iShares.USER_AGENT_LIST)})
+        
+        responseJSON = requests.get(***requestJSON)
+        return responseJSON
+        
+    decoded_data = codecs.decode(responseJSON.text.encode(), 'utf-8-sig')
+    data = json.loads(decoded_data)
+    df = pd.json_normalize(data, record_path=[['aaData']])
+
+    df = df.rename(columns={df.columns[0]: 'Ticker', 
+                        df.columns[8]: 'CUSIP',
+                        df.columns[9]: 'ISIN', 
+                        df.columns[10]: 'SEDOL',
+                        })
+    # Only cols that we need
+    cols = ['Ticker','ISIN', 'CUSIP', 'SEDOL']
+    df = df[cols]
+
+    self = pd.merge(self.holdings_df, df, on = ['Ticker'])
+
+################### Zane Added above code ###############
+def archive_original_csv(self):
 
         input_file_buffer = BytesIO(self.response_content)
         compressed_file_buffer = BytesIO()
@@ -173,6 +213,10 @@ def main(ticker: str, holdings_date: str, outputpath: str) -> pd.DataFrame:
         .upload_filestr()
 
     return holdings.holdings_df
+
+
+
+
 
 
 # everything below will only be executed if this script is called from the command line
